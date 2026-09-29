@@ -1,0 +1,41 @@
+{
+ "actions": [],
+ "creation": "2026-09-29 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "folder_name",
+  "grant_group_access"
+ ],
+ "fields": [
+  {
+   "fieldname": "folder_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Subfolder Name",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "description": "Members of the document's security group can open this subfolder.",
+   "fieldname": "grant_group_access",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Grant Group Access"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-29 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SharePoint Core",
+ "name": "SharePoint Rule Subfolder",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

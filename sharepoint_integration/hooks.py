@@ -18,21 +18,18 @@ after_request = [
 	"sharepoint_integration.utils.api_handlers.response_formatter.format_frappe_response_to_custom"
 ]
 
-# Uncomment and point at the conventional locations as features are added
-# (see CLAUDE.md "Key Conventions"):
-#
-# after_install = "sharepoint_integration.install.after_install"
-#
-# doc_events = {
-# 	"<DocType>": {
-# 		"on_update": "sharepoint_integration.sharepoint_core.customization.<doctype>.<doctype>.on_update"
-# 	}
-# }
-#
-# scheduler_events = {
-# 	"hourly": ["sharepoint_integration.sharepoint_core.tasks.hourly"],
-# }
-#
-# permission_query_conditions = {
-# 	"<DocType>": "sharepoint_integration.sharepoint_core.permissions.get_permission_query_conditions",
-# }
+app_include_js = "sharepoint_integration.bundle.js"
+
+# Every save passes through these; they exit after a cached lookup unless the
+# DocType has a SharePoint Folder Rule.
+doc_events = {
+	"*": {
+		"after_insert": "sharepoint_integration.sharepoint_core.document_events.after_insert",
+		"on_update": "sharepoint_integration.sharepoint_core.document_events.on_update",
+	}
+}
+
+scheduler_events = {
+	"daily": ["sharepoint_integration.sharepoint_core.tasks.daily"],
+	"hourly": ["sharepoint_integration.sharepoint_core.tasks.hourly"],
+}

@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "autoname": "field:connection_name",
+ "creation": "2026-09-29 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "connection_name",
+  "enabled",
+  "base_site",
+  "column_break_app",
+  "tenant_id",
+  "client_id",
+  "client_secret"
+ ],
+ "fields": [
+  {
+   "description": "e.g. Contoso Main Tenant, HD SharePoint",
+   "fieldname": "connection_name",
+   "fieldtype": "Data",
+   "label": "Connection Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "description": "Tenant root, e.g. https://contoso.sharepoint.com",
+   "fieldname": "base_site",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "SharePoint Base URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_app",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "GUID or contoso.onmicrosoft.com",
+   "fieldname": "tenant_id",
+   "fieldtype": "Data",
+   "label": "Tenant ID",
+   "reqd": 1
+  },
+  {
+   "description": "Application (client) ID of the Entra app registration",
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client ID",
+   "reqd": 1
+  },
+  {
+   "description": "Required unless Sandbox Mode is on",
+   "fieldname": "client_secret",
+   "fieldtype": "Password",
+   "label": "Client Secret"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-29 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SharePoint Core",
+ "name": "SharePoint Connection",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "connection_name",
+ "track_changes": 1
+}

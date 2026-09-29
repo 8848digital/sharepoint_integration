@@ -1,0 +1,128 @@
+{
+ "actions": [],
+ "creation": "2026-09-29 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "sandbox_mode",
+  "column_break_general",
+  "default_connection",
+  "section_access",
+  "group_access_role",
+  "restrict_folder_access",
+  "keep_site_owners",
+  "column_break_access",
+  "auto_expire_after_days",
+  "section_notifications",
+  "notify_on_failure",
+  "failure_recipients"
+ ],
+ "fields": [
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "description": "Simulate Microsoft Graph locally (no calls to Microsoft). For demo/QA only - never on production.",
+   "fieldname": "sandbox_mode",
+   "fieldtype": "Check",
+   "label": "Sandbox Mode"
+  },
+  {
+   "fieldname": "column_break_general",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Pre-filled on new Folder Rules. Each rule can use a different connection (tenant / app).",
+   "fieldname": "default_connection",
+   "fieldtype": "Link",
+   "label": "Default Connection",
+   "options": "SharePoint Connection"
+  },
+  {
+   "fieldname": "section_access",
+   "fieldtype": "Section Break",
+   "label": "Access"
+  },
+  {
+   "default": "write",
+   "description": "Role given to a document's security group on its folder.",
+   "fieldname": "group_access_role",
+   "fieldtype": "Select",
+   "label": "Group Access Role",
+   "options": "write\nread"
+  },
+  {
+   "default": "1",
+   "description": "After granting access, remove grants copied from the parent folder so only the owners and the group can open it.",
+   "fieldname": "restrict_folder_access",
+   "fieldtype": "Check",
+   "label": "Restrict Folder Access"
+  },
+  {
+   "default": "1",
+   "depends_on": "restrict_folder_access",
+   "description": "Never remove the site owners' grant when restricting access.",
+   "fieldname": "keep_site_owners",
+   "fieldtype": "Check",
+   "label": "Keep Site Owners"
+  },
+  {
+   "fieldname": "column_break_access",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "When a member's To Date passes and no Expiry Date is set, set Expiry Date = To Date + these days. 0 disables.",
+   "fieldname": "auto_expire_after_days",
+   "fieldtype": "Int",
+   "label": "Auto Expire After (Days)"
+  },
+  {
+   "fieldname": "section_notifications",
+   "fieldtype": "Section Break",
+   "label": "Failure Notifications"
+  },
+  {
+   "fieldname": "notify_on_failure",
+   "fieldtype": "Check",
+   "label": "Email on Failure"
+  },
+  {
+   "depends_on": "notify_on_failure",
+   "fieldname": "failure_recipients",
+   "fieldtype": "Table MultiSelect",
+   "label": "Recipients",
+   "options": "SharePoint Notification Recipient"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-29 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SharePoint Core",
+ "name": "SharePoint Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
