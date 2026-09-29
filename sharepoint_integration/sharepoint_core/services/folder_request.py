@@ -143,6 +143,9 @@ def __insert_folder(doc, rule: str) -> str:
 	template, connection = frappe.db.get_value(
 		"SharePoint Folder Rule", rule, ["folder_name_template", "connection"]
 	)
+	# The template comes only from SharePoint Folder Rule, which only System Managers
+	# can edit, and Frappe renders it in its sandboxed Jinja environment.
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 	folder_name = sanitize_folder_name(frappe.render_template(template, {"doc": doc})) or doc.name
 
 	record = frappe.get_doc(

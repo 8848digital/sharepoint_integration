@@ -82,7 +82,7 @@ class AccessSync:
 		self.directory = DirectoryService(GraphClient.from_connection(self.folder.connection))
 
 		rows = [row for row in self.access.members if row.access_status in SYNCABLE_STATUSES]
-		failures = [error for error in map(self.__grant, rows) if error]
+		failures = [error for error in (self.__grant(row) for row in rows) if error]
 		if failures:
 			self.access.error = "\n".join(failures)
 			notify_failure(self.access, subject="SharePoint access could not be granted")
