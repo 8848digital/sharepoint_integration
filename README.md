@@ -53,7 +53,9 @@ folders by adding a Folder Rule for it — no code changes per client.
 
 ## Installation
 
-    bench get-app sharepoint_integration https://github.com/8848digital/sharepoint_integration --branch develop
+Requires Frappe v15 or v16.
+
+    bench get-app sharepoint_integration https://github.com/8848digital/sharepoint_integration --branch integration-master
     bench --site <site_name> install-app sharepoint_integration
 
 ## App Structure
