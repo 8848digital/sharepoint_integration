@@ -67,14 +67,25 @@ Folder Name Template; Workflow State (for "On Workflow State"); Template File
 ID + File Name (when "Copy Template File" is on). Site Name / Document Library
 blank = root site / default library. Use **Resolve Site** to verify.
 
+Attachments (optional): **Upload Attachments** sends files attached to the
+document to its folder; **Attachment Subfolder** (e.g. `Attachments`) puts them
+in a subfolder; **Remove Local Copy** deletes the file from the server after
+upload and points the attachment to SharePoint (people then need SharePoint
+access to open it; files used in a form field, such as an image, are always
+kept). No extra Graph permission is needed beyond the site permission above.
+
+**Create Folders for Existing Records** (button on a saved, enabled rule) runs
+in the background and messages you the totals when it ends.
+
 Template File ID: open the file in SharePoint → Details → copy the item id, or
 `GET https://graph.microsoft.com/v1.0/drives/{drive-id}/root:/{path-to-file}`
 and take `id`. If the template lives in another library, set Template Drive ID.
 
 ### Site Config / Environment Variables
 None. Background workers (`bench start` / supervisor) must be running: folder
-creation and access sync run as background jobs; expiry runs daily and retries
-hourly via the scheduler.
+creation, attachment uploads and access sync run as background jobs; expiry
+runs daily, and access grants and failed uploads are retried hourly via the
+scheduler.
 
 ### Webhooks (if applicable)
 None.
@@ -90,3 +101,7 @@ None.
    member status becomes `Granted`.
 5. Select the member row → **Revoke Access** → enter a reason → status becomes
    `Revoked` with Removed On and Remarks filled.
+6. Tick **Upload Attachments** on the rule → attach a file to the document →
+   **SharePoint File** list shows it `Uploaded` with a link to the file.
+7. On the rule click **Create Folders for Existing Records** → confirm → a
+   message shows how many folders and uploads were queued.

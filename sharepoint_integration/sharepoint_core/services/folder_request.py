@@ -56,6 +56,23 @@ def request_folder(doc, event: str) -> str | None:
 	return folder_name
 
 
+def request_folder_for_rule(doc, rule: str) -> str:
+	"""
+	Queue a folder for an existing document with a given rule (bulk run).
+	The caller has checked the rule's condition and that no folder exists.
+
+	Parameters:
+	        doc (Document, required): The reference document.
+	        rule (str, required): SharePoint Folder Rule name.
+
+	Returns:
+	        str: New SharePoint Folder name.
+	"""
+	folder_name = __insert_folder(doc, rule)
+	enqueue_provisioning(folder_name)
+	return folder_name
+
+
 def request_folder_manually(doctype: str, docname: str) -> dict:
 	"""
 	Create (or retry) the folder of a document from the "Create SharePoint Folder" button.

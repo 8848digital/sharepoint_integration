@@ -5,6 +5,10 @@
 
 import frappe
 
+from sharepoint_integration.sharepoint_core.services.bulk_folders import (
+	count_existing,
+	queue_existing,
+)
 from sharepoint_integration.sharepoint_core.services.folder_query import get_folder_details
 from sharepoint_integration.sharepoint_core.services.folder_request import (
 	request_folder_manually,
@@ -81,3 +85,41 @@ def retry(folder: str):
 	"""
 	retry_folder(folder)
 	return api_response(message="SharePoint folder queued")
+
+
+@frappe.whitelist(methods=["GET"])
+def count_existing_records(rule: str):
+	"""
+	        Count the records a Folder Rule covers and how many already have a
+	        folder (shown before "Create Folders for Existing Records").
+
+	        **Endpoint:** `/api/method/sharepoint_integration.sharepoint_core.api.v1.folder.count_existing_records`
+	        **HTTP Method:** GET
+	        **Parameters:**
+	                - rule (str, required): SharePoint Folder Rule name
+	        **Response:**
+	```json
+	                {"status": true, "status_code": 200, "message": "Success", "data": {"records": 120, "with_folder": 15}, "errors": null}
+	```
+	"""
+	return api_response(data=count_existing(rule))
+
+
+@frappe.whitelist(methods=["POST"])
+def create_for_existing_records(rule: str):
+	"""
+	        Create folders for existing records that match a Folder Rule and have
+	        none, and queue attachments of records that already have one. Runs in
+	        the background; the user gets a message with the totals when it ends.
+
+	        **Endpoint:** `/api/method/sharepoint_integration.sharepoint_core.api.v1.folder.create_for_existing_records`
+	        **HTTP Method:** POST
+	        **Parameters:**
+	                - rule (str, required): SharePoint Folder Rule name
+	        **Response:**
+	```json
+	                {"status": true, "status_code": 200, "message": "Folders for existing records queued", "data": null, "errors": null}
+	```
+	"""
+	queue_existing(rule)
+	return api_response(message="Folders for existing records queued")

@@ -26,7 +26,10 @@ doc_events = {
 	"*": {
 		"after_insert": "sharepoint_integration.sharepoint_core.document_events.after_insert",
 		"on_update": "sharepoint_integration.sharepoint_core.document_events.on_update",
-	}
+	},
+	"File": {
+		"after_insert": "sharepoint_integration.sharepoint_core.customization.file.file.after_insert",
+	},
 }
 
 scheduler_events = {

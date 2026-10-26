@@ -38,7 +38,12 @@
   "template_item_id",
   "template_file_name",
   "column_break_template",
-  "template_drive_id"
+  "template_drive_id",
+  "section_attachments",
+  "upload_attachments",
+  "attachment_subfolder",
+  "column_break_attachments",
+  "remove_local_copy"
  ],
  "fields": [
   {
@@ -255,11 +260,42 @@
    "fieldname": "template_drive_id",
    "fieldtype": "Small Text",
    "label": "Template Drive ID"
+  },
+  {
+   "fieldname": "section_attachments",
+   "fieldtype": "Section Break",
+   "label": "Attachments"
+  },
+  {
+   "default": "0",
+   "description": "Upload files attached to the document into its SharePoint folder (also files attached before the folder was created).",
+   "fieldname": "upload_attachments",
+   "fieldtype": "Check",
+   "label": "Upload Attachments"
+  },
+  {
+   "depends_on": "upload_attachments",
+   "description": "Optional subfolder of the document folder for the files, e.g. Attachments. Created when missing.",
+   "fieldname": "attachment_subfolder",
+   "fieldtype": "Data",
+   "label": "Attachment Subfolder"
+  },
+  {
+   "fieldname": "column_break_attachments",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "upload_attachments",
+   "description": "After upload, delete the file from this server and point the attachment to SharePoint (saves disk space; people then need SharePoint access to open it). Files used in a form field such as an image are always kept.",
+   "fieldname": "remove_local_copy",
+   "fieldtype": "Check",
+   "label": "Remove Local Copy"
   }
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-29 13:00:00.000000",
+ "modified": "2026-10-26 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "SharePoint Core",
  "name": "SharePoint Folder Rule",

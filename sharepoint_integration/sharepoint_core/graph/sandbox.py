@@ -11,10 +11,16 @@ survives across background jobs. Never enable on production.
 """
 
 import re
+from functools import partial
 from urllib.parse import unquote, urlparse
 
 import frappe
 
+from sharepoint_integration.sharepoint_core.graph.sandbox_files import (
+	upload,
+	upload_chunk,
+	upload_session,
+)
 from sharepoint_integration.sharepoint_core.graph.sandbox_support import (
 	SandboxResponse,
 	_group_by_id,
@@ -44,6 +50,7 @@ class SandboxTransport:
 			("GET", r"/sites/[^/]+:/sites/(?P<site>[^/]+)$", self.__site),
 			("GET", r"/sites/(?P<site>[^/:]+)$", self.__site),
 			("GET", r"/sites/(?P<site_id>[^/]+)/drive$", self.__drive),
+			("GET", r"/drives/(?P<drive>[^/:]+)$", self.__library),
 			("GET", r"/sites/(?P<site_id>[^/]+)/drives$", self.__drives),
 			("POST", r"/drives/(?P<drive>[^/]+)/root(:/(?P<path>.+):)?/children$", self.__create_folder),
 			("GET", r"/drives/(?P<drive>[^/]+)/root:/(?P<path>.+)$", self.__get_by_path),
@@ -60,6 +67,17 @@ class SandboxTransport:
 			("POST", r"/groups/(?P<group>[^/]+)/members/\$ref$", self.__add_member),
 			("DELETE", r"/groups/(?P<group>[^/]+)/members/(?P<user>[^/]+)/\$ref$", self.__remove_member),
 			("GET", r"/users/(?P<email>[^/]+)$", self.__user),
+			(
+				"PUT",
+				r"/drives/[^/]+/items/(?P<parent>[^/:]+):/(?P<name>[^:/]+):/content$",
+				partial(upload, self.base_site),
+			),
+			(
+				"POST",
+				r"/drives/[^/]+/items/(?P<parent>[^/:]+):/(?P<name>[^:/]+):/createUploadSession$",
+				partial(upload_session, self.base_site),
+			),
+			("PUT", r"/_sandbox/upload/(?P<session>[^/]+)$", partial(upload_chunk, self.base_site)),
 		]
 
 	def request(self, method: str, url: str, **kwargs) -> SandboxResponse:
@@ -99,6 +117,12 @@ class SandboxTransport:
 	def __drive(self, state, args, kwargs):
 		"""Return the default "Documents" library of a fake site."""
 		return SandboxResponse(200, {"id": f"sandbox-drive-{args['site_id']}", "name": "Documents"})
+
+	def __library(self, state, args, kwargs):
+		"""Return a fake library's webUrl."""
+		return SandboxResponse(
+			200, {"id": args["drive"], "webUrl": f"{self.base_site}/Shared%20Documents"}
+		)
 
 	def __drives(self, state, args, kwargs):
 		"""List a fake site's libraries."""

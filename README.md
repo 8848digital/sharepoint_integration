@@ -25,6 +25,7 @@ folders by adding a Folder Rule for it — no code changes per client.
 | SharePoint Folder Rule | Yes | For one DocType (optionally one variant, e.g. External projects): which connection, when to create a folder, where, its name, subfolders, owners and template file. |
 | SharePoint Folder | Yes | One record per document's folder: status, link, ids, security group and errors. Retry from here. |
 | SharePoint Access | Yes | Who can open a document's folder and for which dates; synced to the document's security group. |
+| SharePoint File | Yes | One record per attachment sent to SharePoint: status, link, whether the local copy was removed, errors. Retry from here. |
 | Any DocType with a rule | No (customized) | Gets a "SharePoint" section (folder + link) and "Open in SharePoint" / "Create Folder" buttons. |
 
 ## Features
@@ -45,6 +46,13 @@ folders by adding a Folder Rule for it — no code changes per client.
   people immediately with a reason. Expired/revoked rows are kept as an audit
   trail (rows that had access can't be deleted or switched to another user;
   re-adding a person creates a new row).
+- Attachments: files attached to a document are uploaded into its SharePoint
+  folder (optionally into a subfolder such as "Attachments"), including files
+  attached before the folder existed. Large files are uploaded in pieces.
+  Optionally the local copy is deleted after upload and the attachment opens
+  the SharePoint file instead, saving server disk space.
+- **Create Folders for Existing Records** on a Folder Rule: at go-live, create
+  folders (and upload attachments) for documents that existed before the rule.
 - Failure log per document, retry button, and optional failure emails.
 - Sandbox mode to demo/QA the whole flow without a Microsoft tenant.
 
