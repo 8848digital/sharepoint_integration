@@ -19,14 +19,13 @@ from sharepoint_integration.sharepoint_core.services.folder_failure import (
 	STEP_OWNER_ACCESS,
 	STEP_RESTRICT,
 	STEP_SUBFOLDERS,
-	failure_reason,
+	mark_failed,
 )
 from sharepoint_integration.sharepoint_core.services.folder_outcome import (
 	link_reference,
 	sync_pending_access,
 )
 from sharepoint_integration.sharepoint_core.services.folder_request import sanitize_folder_name
-from sharepoint_integration.sharepoint_core.services.notifications import notify_failure
 
 
 class FolderProvisioner:
@@ -87,7 +86,7 @@ class FolderProvisioner:
 			template_error = self.__copy_template(parent["id"], drive_id)
 			self.__mark_created(parent, drive_id, subfolders, group, template_error)
 		except Exception as error:
-			self.__mark_failed(error)
+			mark_failed(self.record, error, self.step, self.owners)
 
 	def __ensure_group(self, directory: DirectoryService) -> dict | None:
 		"""
@@ -231,27 +230,6 @@ class FolderProvisioner:
 		self.record.save(ignore_permissions=True)
 		link_reference(self.record)
 		sync_pending_access(self.record)
-
-	def __mark_failed(self, error: Exception) -> None:
-		"""
-		Save the failure with a plain-language reason, log the traceback and
-		email the configured recipients.
-
-		Parameters:
-		        error (Exception, required): The exception raised during provisioning.
-
-		Returns:
-		        None
-		"""
-		frappe.log_error("SharePoint | Folder provisioning failed", frappe.get_traceback())
-		self.record.db_set(
-			{
-				"status": "Failed",
-				"error": failure_reason(error, self.step, self.owners)[:5000],
-				"attempts": self.record.attempts,
-			}
-		)
-		notify_failure(self.record)
 
 	def __folder_path(self) -> str:
 		"""

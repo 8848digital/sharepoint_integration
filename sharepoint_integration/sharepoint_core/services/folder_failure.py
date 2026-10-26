@@ -5,9 +5,11 @@
 
 """Plain-language reason saved on a SharePoint Folder when provisioning fails."""
 
+import frappe
 from frappe import _
 
 from sharepoint_integration.sharepoint_core.graph.common import GraphError, is_unresolved_recipient
+from sharepoint_integration.sharepoint_core.services.notifications import notify_failure
 
 STEP_FOLDER = "Creating the folder"
 STEP_GROUP = "Creating the security group"
@@ -24,6 +26,31 @@ STATUS_HINTS = {
 	429: "Microsoft is busy (throttling). Click Retry in a few minutes.",
 	503: "Microsoft is temporarily unavailable. Click Retry in a few minutes.",
 }
+
+
+def mark_failed(record, error: Exception, step: str, owners: list[str]) -> None:
+	"""
+	Save the failure with a plain-language reason, log the traceback and
+	email the configured recipients.
+
+	Parameters:
+	        record (Document, required): SharePoint Folder being provisioned.
+	        error (Exception, required): The exception raised during provisioning.
+	        step (str, required): One of the STEP_* constants.
+	        owners (list[str], required): Owner emails of the folder.
+
+	Returns:
+	        None
+	"""
+	frappe.log_error("SharePoint | Folder provisioning failed", frappe.get_traceback())
+	record.db_set(
+		{
+			"status": "Failed",
+			"error": failure_reason(error, step, owners)[:5000],
+			"attempts": record.attempts,
+		}
+	)
+	notify_failure(record)
 
 
 def failure_reason(error: Exception, step: str, owners: list[str] | None = None) -> str:
