@@ -93,4 +93,6 @@ class TestSharePointBulkFolders(FrappeTestCase):
 
 		create_existing_folders(RULE)
 		run_jobs(self.jobs)
-		self.assertEqual(frappe.db.get_value("SharePoint File", {"file": file.name}, "status"), "Uploaded")
+		self.assertEqual(
+			frappe.db.get_value("SharePoint File", {"file": file.name}, "status"), "Uploaded"
+		)
