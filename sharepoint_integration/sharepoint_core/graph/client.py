@@ -23,6 +23,8 @@ LOGIN_URL = "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
 RETRY_STATUSES = (429, 503, 504)
 MAX_ATTEMPTS = 3
 TIMEOUT_SECONDS = 30
+# File uploads send up to 10 MB per request, so they get longer than JSON calls.
+UPLOAD_TIMEOUT_SECONDS = 300
 TOKEN_SAFETY_SECONDS = 300
 
 
@@ -120,15 +122,29 @@ class GraphClient:
 		"""
 		return self.request("DELETE", path)
 
-	def request(self, method: str, path: str, body: dict | None = None, params: dict | None = None):
+	def request(
+		self,
+		method: str,
+		path: str,
+		body: dict | None = None,
+		params: dict | None = None,
+		data: bytes | None = None,
+		headers: dict | None = None,
+		auth: bool = True,
+	):
 		"""
-		Send an authenticated request, retrying on throttling (429/503/504).
+		Send a request, retrying on throttling (429/503/504).
 
 		Parameters:
 		        method (str, required): HTTP verb.
-		        path (str, required): Path relative to the Graph v1.0 root.
+		        path (str, required): Path relative to the Graph v1.0 root, or a full URL
+		                (e.g. an upload session's uploadUrl).
 		        body (dict, optional): JSON payload.
 		        params (dict, optional): Query string parameters.
+		        data (bytes, optional): Raw payload (file content) instead of JSON.
+		        headers (dict, optional): Extra headers, e.g. Content-Range.
+		        auth (bool, optional): Send the bearer token. Upload session URLs are
+		                pre-authenticated and reject it.
 
 		Returns:
 		        Response: The successful response.
@@ -136,10 +152,17 @@ class GraphClient:
 		Raises:
 		        GraphError: On any non-2xx response after retries.
 		"""
-		url = f"{GRAPH_ROOT}{path}"
+		url = path if path.startswith("https://") else f"{GRAPH_ROOT}{path}"
+		request_headers = {**self.__headers(auth, data is not None), **(headers or {})}
 		for attempt in range(1, MAX_ATTEMPTS + 1):
 			response = self.transport.request(
-				method, url, headers=self.__headers(), json=body, params=params, timeout=TIMEOUT_SECONDS
+				method,
+				url,
+				headers=request_headers,
+				json=body,
+				data=data,
+				params=params,
+				timeout=TIMEOUT_SECONDS if data is None else UPLOAD_TIMEOUT_SECONDS,
 			)
 			if response.status_code not in RETRY_STATUSES or attempt == MAX_ATTEMPTS:
 				break
@@ -203,18 +226,22 @@ class GraphClient:
 		payload = response.json()
 		return payload["access_token"], int(payload.get("expires_in", 3600))
 
-	def __headers(self) -> dict:
+	def __headers(self, auth: bool = True, raw: bool = False) -> dict:
 		"""
-		Build the standard JSON + bearer headers.
+		Build the standard headers: bearer token (unless `auth` is off) and JSON
+		or binary content type.
 
 		Parameters:
-		        None
+		        auth (bool, optional): Include the Authorization header.
+		        raw (bool, optional): The body is file content, not JSON.
 
 		Returns:
 		        dict: Request headers.
 		"""
-		return {
-			"Authorization": f"Bearer {self.get_token()}",
+		headers = {
 			"Accept": "application/json",
-			"Content-Type": "application/json",
+			"Content-Type": "application/octet-stream" if raw else "application/json",
 		}
+		if auth:
+			headers["Authorization"] = f"Bearer {self.get_token()}"
+		return headers

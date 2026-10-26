@@ -21,10 +21,7 @@ from sharepoint_integration.sharepoint_core.services.folder_failure import (
 	STEP_SUBFOLDERS,
 	mark_failed,
 )
-from sharepoint_integration.sharepoint_core.services.folder_outcome import (
-	link_reference,
-	sync_pending_access,
-)
+from sharepoint_integration.sharepoint_core.services.folder_outcome import finish_created
 from sharepoint_integration.sharepoint_core.services.folder_request import sanitize_folder_name
 
 
@@ -201,7 +198,8 @@ class FolderProvisioner:
 		self, parent: dict, drive_id: str, subfolders: list[str], group, template_error
 	) -> None:
 		"""
-		Save success details and link the folder back onto the reference document.
+		Save success details, link the folder back onto the reference document and
+		queue its attachments.
 
 		Parameters:
 		        parent (dict, required): Folder driveItem.
@@ -228,8 +226,7 @@ class FolderProvisioner:
 			}
 		)
 		self.record.save(ignore_permissions=True)
-		link_reference(self.record)
-		sync_pending_access(self.record)
+		finish_created(self.record)
 
 	def __folder_path(self) -> str:
 		"""

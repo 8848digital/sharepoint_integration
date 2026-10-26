@@ -8,6 +8,23 @@
 import frappe
 
 from sharepoint_integration.sharepoint_core.services.access_sync import enqueue_access_sync
+from sharepoint_integration.sharepoint_core.services.file_request import queue_document_files
+
+
+def finish_created(record) -> None:
+	"""
+	After a folder is created: link it on the document, sync members added
+	earlier and queue the document's attachments.
+
+	Parameters:
+	        record (Document, required): Created SharePoint Folder.
+
+	Returns:
+	        None
+	"""
+	link_reference(record)
+	sync_pending_access(record)
+	queue_document_files(record)
 
 
 def link_reference(record) -> None:

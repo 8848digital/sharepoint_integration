@@ -49,6 +49,22 @@ def find_matching_rule(doc, event: str) -> str | None:
 	return None
 
 
+def condition_holds(rule_name: str, condition: str | None, doc) -> bool:
+	"""
+	Evaluate a rule's condition on a document outside a save event
+	(e.g. "Create Folders for Existing Records").
+
+	Parameters:
+	        rule_name (str, required): SharePoint Folder Rule name (for error logs).
+	        condition (str, optional): Python expression using `doc`.
+	        doc (Document, required): The reference document.
+
+	Returns:
+	        bool: True if there is no condition or it evaluates truthy.
+	"""
+	return __condition_matches({"name": rule_name, "condition": condition}, doc)
+
+
 def clear_rule_cache(doctype: str | None = None) -> None:
 	"""
 	Drop cached rule lookups after a rule is saved or deleted.

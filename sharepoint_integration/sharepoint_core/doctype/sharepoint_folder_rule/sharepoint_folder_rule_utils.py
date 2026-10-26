@@ -44,6 +44,7 @@ def validate_rule(doc) -> None:
 	validate_owner_fields(doc)
 	validate_date_fields(doc)
 	validate_template_file(doc)
+	__validate_attachments(doc)
 	__warn_on_overlap(doc)
 
 
@@ -184,6 +185,27 @@ def __validate_subfolders(doc) -> None:
 		if row.folder_name.lower() in seen:
 			frappe.throw(_("Row {0}: Subfolder {1} is listed twice").format(row.idx, row.folder_name))
 		seen.add(row.folder_name.lower())
+
+
+def __validate_attachments(doc) -> None:
+	"""
+	Clear attachment options when uploads are off; the subfolder name must be
+	valid for SharePoint.
+
+	Parameters:
+	        doc (Document, required): SharePoint Folder Rule.
+
+	Returns:
+	        None
+	"""
+	if not doc.upload_attachments:
+		doc.attachment_subfolder, doc.remove_local_copy = None, 0
+		return
+	if doc.attachment_subfolder:
+		cleaned = sanitize_folder_name(doc.attachment_subfolder)
+		if not cleaned:
+			frappe.throw(_("Attachment Subfolder is empty after removing invalid characters"))
+		doc.attachment_subfolder = cleaned
 
 
 def __warn_on_overlap(doc) -> None:
