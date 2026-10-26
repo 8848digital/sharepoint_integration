@@ -21,15 +21,9 @@ frappe.ui.form.on("SharePoint Folder", {
 		}
 		if (frm.doc.status === "Failed") {
 			frm.add_custom_button(__("Retry"), () =>
-				frappe.call({
+				sharepoint_integration.call({
 					method: "sharepoint_integration.sharepoint_core.api.v1.folder.retry",
 					args: { folder: frm.doc.name },
-					error: (r) =>
-						frappe.msgprint({
-							title: __("SharePoint"),
-							indicator: "red",
-							message: (r && r.message) || __("Request failed"),
-						}),
 					callback: () => frm.reload_doc(),
 				})
 			);

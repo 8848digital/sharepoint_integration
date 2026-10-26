@@ -26,7 +26,7 @@ folders by adding a Folder Rule for it — no code changes per client.
 | SharePoint Folder | Yes | One record per document's folder: status, link, ids, security group and errors. Retry from here. |
 | SharePoint Access | Yes | Who can open a document's folder and for which dates; synced to the document's security group. |
 | SharePoint File | Yes | One record per attachment sent to SharePoint: status, link, whether the local copy was removed, errors. Retry from here. |
-| Any DocType with a rule | No (customized) | Gets a "SharePoint" section (folder + link) and "Open in SharePoint" / "Create Folder" buttons. |
+| Any DocType with a rule | No (customized) | Gets a "SharePoint" section (folder + link) and "Open in SharePoint" / "Create Folder" buttons. The buttons show only while SharePoint Settings is enabled and the DocType has an enabled rule; "Create Folder" only for users who can edit the document. |
 
 ## Features
 - Create a SharePoint folder automatically when a document is created, saved,

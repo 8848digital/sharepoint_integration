@@ -86,6 +86,8 @@ def request_folder_manually(doctype: str, docname: str) -> dict:
 	"""
 	doc = frappe.get_doc(doctype, docname)
 	doc.check_permission("write")
+	if not frappe.db.get_single_value("SharePoint Settings", "enabled"):
+		frappe.throw(_("SharePoint Integration is disabled in SharePoint Settings"))
 	folder = request_folder(doc, "manual")
 	return {"folder": folder, "status": frappe.db.get_value("SharePoint Folder", folder, "status")}
 

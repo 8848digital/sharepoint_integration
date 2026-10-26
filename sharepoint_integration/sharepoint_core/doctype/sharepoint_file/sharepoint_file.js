@@ -21,15 +21,9 @@ frappe.ui.form.on("SharePoint File", {
 		}
 		if (frm.doc.status === "Failed") {
 			frm.add_custom_button(__("Retry Upload"), () =>
-				frappe.call({
+				sharepoint_integration.call({
 					method: "sharepoint_integration.sharepoint_core.api.v1.file.retry_upload",
 					args: { sharepoint_file: frm.doc.name },
-					error: (r) =>
-						frappe.msgprint({
-							title: __("SharePoint"),
-							indicator: "red",
-							message: (r && r.message) || __("Request failed"),
-						}),
 					callback: () => frm.reload_doc(),
 				})
 			);

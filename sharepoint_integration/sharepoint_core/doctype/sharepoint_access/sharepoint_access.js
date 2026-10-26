@@ -37,15 +37,9 @@ frappe.ui.form.on("SharePoint Access", {
 		}
 		frm.add_custom_button(__("Revoke Access"), () => revokeSelected(frm));
 		frm.add_custom_button(__("Sync Now"), () =>
-			frappe.call({
+			sharepoint_integration.call({
 				method: "sharepoint_integration.sharepoint_core.api.v1.access.sync_now",
 				args: { access: frm.doc.name },
-				error: (r) =>
-					frappe.msgprint({
-						title: __("SharePoint"),
-						indicator: "red",
-						message: (r && r.message) || __("Request failed"),
-					}),
 				callback: () =>
 					frappe.show_alert({ message: __("Access sync queued"), indicator: "blue" }),
 			})
@@ -78,7 +72,7 @@ function revokeSelected(frm) {
 	frappe.prompt(
 		{ fieldname: "remarks", fieldtype: "Small Text", label: __("Reason"), reqd: 1 },
 		(values) =>
-			frappe.call({
+			sharepoint_integration.call({
 				method: "sharepoint_integration.sharepoint_core.api.v1.access.revoke",
 				args: {
 					access: frm.doc.name,
@@ -87,12 +81,6 @@ function revokeSelected(frm) {
 				},
 				freeze: true,
 				freeze_message: __("Removing access..."),
-				error: (r) =>
-					frappe.msgprint({
-						title: __("SharePoint"),
-						indicator: "red",
-						message: (r && r.message) || __("Request failed"),
-					}),
 				callback: (r) => {
 					const data = r.data || {};
 					const errors = data.errors || [];
