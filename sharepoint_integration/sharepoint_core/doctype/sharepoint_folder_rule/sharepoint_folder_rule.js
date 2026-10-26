@@ -26,16 +26,10 @@ frappe.ui.form.on("SharePoint Folder Rule", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 		frm.add_custom_button(__("Resolve Site"), () =>
-			frappe.call({
+			sharepoint_integration.call({
 				method: "sharepoint_integration.sharepoint_core.api.v1.settings.resolve_rule_site",
 				args: { rule: frm.doc.name },
 				freeze: true,
-				error: (r) =>
-					frappe.msgprint({
-						title: __("SharePoint"),
-						indicator: "red",
-						message: (r && r.message) || __("Request failed"),
-					}),
 				callback: () => frm.reload_doc(),
 			})
 		);
@@ -55,7 +49,7 @@ frappe.ui.form.on("SharePoint Folder Rule", {
  */
 function confirm_existing_records(frm) {
 	const api = "sharepoint_integration.sharepoint_core.api.v1.folder";
-	frappe.call({
+	sharepoint_integration.call({
 		method: `${api}.count_existing_records`,
 		args: { rule: frm.doc.name },
 		type: "GET",
@@ -69,7 +63,7 @@ function confirm_existing_records(frm) {
 				[__(frm.doc.reference_doctype), counts.records, counts.with_folder, uploads]
 			);
 			frappe.confirm(message, () =>
-				frappe.call({
+				sharepoint_integration.call({
 					method: `${api}.create_for_existing_records`,
 					args: { rule: frm.doc.name },
 					freeze: true,

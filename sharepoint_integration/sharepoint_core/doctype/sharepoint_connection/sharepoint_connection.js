@@ -13,17 +13,11 @@ frappe.ui.form.on("SharePoint Connection", {
 	refresh(frm) {
 		if (frm.is_new() || !frm.doc.enabled) return;
 		frm.add_custom_button(__("Test Connection"), () =>
-			frappe.call({
+			sharepoint_integration.call({
 				method: "sharepoint_integration.sharepoint_core.api.v1.settings.check_connection",
 				args: { connection: frm.doc.name },
 				freeze: true,
 				freeze_message: __("Connecting to SharePoint..."),
-				error: (r) =>
-					frappe.msgprint({
-						title: __("SharePoint"),
-						indicator: "red",
-						message: (r && r.message) || __("Request failed"),
-					}),
 				callback: (r) => {
 					const data = r.data || {};
 					frappe.msgprint({
