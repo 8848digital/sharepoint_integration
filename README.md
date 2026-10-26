@@ -13,19 +13,49 @@ Microsoft SharePoint, so business documents and their attachments can be stored
 and accessed in SharePoint document libraries alongside the ERP records they
 belong to.
 
+It is generic: any DocType (standard, ERPNext or custom) can get SharePoint
+folders by adding a Folder Rule for it — no code changes per client.
+
 ## Key DocTypes
-_None yet — this section is filled in as DocTypes are added._
+
+| DocType | Owned by this app? | Purpose |
+| ------- | ------------------ | ------- |
+| SharePoint Connection | Yes | One Microsoft tenant / Entra app registration (base URL, tenant id, client id, secret). A client can have several. |
+| SharePoint Settings | Yes | Global switch, sandbox mode, default connection, access and failure-email options. |
+| SharePoint Folder Rule | Yes | For one DocType (optionally one variant, e.g. External projects): which connection, when to create a folder, where, its name, subfolders, owners and template file. |
+| SharePoint Folder | Yes | One record per document's folder: status, link, ids, security group and errors. Retry from here. |
+| SharePoint Access | Yes | Who can open a document's folder and for which dates; synced to the document's security group. |
+| Any DocType with a rule | No (customized) | Gets a "SharePoint" section (folder + link) and "Open in SharePoint" / "Create Folder" buttons. |
 
 ## Features
-_Initial app setup only — features are listed here as they are built._
+- Create a SharePoint folder automatically when a document is created, saved,
+  or reaches a workflow state — or on demand with a button.
+- Multiple SharePoint tenants / app registrations per client: each rule picks
+  its connection, and each folder remembers the tenant it was created in.
+- Different site/path/subfolders per DocType and per variant (rule conditions,
+  e.g. External vs Internal projects).
+- Folder names from a template (e.g. `{{ doc.party_name }}-{{ doc.name }}`),
+  cleaned of characters SharePoint rejects.
+- Subfolders created automatically, each with its own group-access setting.
+- A template file (PPT/Word/any size) copied into every new folder server-side.
+- One security group per document; people get access by being added to the
+  group, so access applies consistently and can be removed cleanly.
+- Owners (from user fields on the document) always get write access.
+- Access dates with automatic expiry, and **Revoke Access** to remove selected
+  people immediately with a reason. Expired/revoked rows are kept as an audit
+  trail (rows that had access can't be deleted or switched to another user;
+  re-adding a person creates a new row).
+- Failure log per document, retry button, and optional failure emails.
+- Sandbox mode to demo/QA the whole flow without a Microsoft tenant.
 
 ## Integrations
-- **Microsoft SharePoint (via Microsoft Graph)** — configuration will be
-  documented in `SETUP.md` once the integration is added.
+- **Microsoft SharePoint & Entra ID (via Microsoft Graph)** — see [SETUP.md](./SETUP.md#microsoft-sharepoint--entra-id-microsoft-graph)
 
 ## Installation
 
-    bench get-app sharepoint_integration https://github.com/8848digital/sharepoint_integration --branch develop
+Requires Frappe v15 or v16.
+
+    bench get-app sharepoint_integration https://github.com/8848digital/sharepoint_integration --branch integration-master
     bench --site <site_name> install-app sharepoint_integration
 
 ## App Structure

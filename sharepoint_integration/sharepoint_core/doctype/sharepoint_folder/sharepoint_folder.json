@@ -1,0 +1,190 @@
+{
+ "actions": [],
+ "autoname": "format:SPF-{#####}",
+ "creation": "2026-09-29 13:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_doctype",
+  "reference_name",
+  "rule",
+  "connection",
+  "column_break_status",
+  "status",
+  "attempts",
+  "web_url",
+  "section_folder",
+  "folder_name",
+  "folder_path",
+  "subfolders",
+  "template_copied",
+  "column_break_folder",
+  "folder_id",
+  "drive_id",
+  "group_id",
+  "group_name",
+  "section_error",
+  "error"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Reference DocType",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Reference Name",
+   "options": "reference_doctype",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "rule",
+   "fieldtype": "Link",
+   "label": "Rule",
+   "options": "SharePoint Folder Rule",
+   "read_only": 1
+  },
+  {
+   "fieldname": "connection",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Connection",
+   "options": "SharePoint Connection",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_status",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Queued",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Queued\nCreated\nFailed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attempts",
+   "fieldtype": "Int",
+   "label": "Attempts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "web_url",
+   "fieldtype": "Data",
+   "label": "SharePoint Link",
+   "options": "URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_folder",
+   "fieldtype": "Section Break",
+   "label": "Folder"
+  },
+  {
+   "fieldname": "folder_name",
+   "fieldtype": "Data",
+   "label": "Folder Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "folder_path",
+   "fieldtype": "Small Text",
+   "label": "Folder Path",
+   "read_only": 1
+  },
+  {
+   "fieldname": "subfolders",
+   "fieldtype": "Small Text",
+   "label": "Subfolders Created",
+   "read_only": 1
+  },
+  {
+   "fieldname": "template_copied",
+   "fieldtype": "Check",
+   "label": "Template Copied",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_folder",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "folder_id",
+   "fieldtype": "Data",
+   "label": "Folder ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "drive_id",
+   "fieldtype": "Small Text",
+   "label": "Drive ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "group_id",
+   "fieldtype": "Data",
+   "label": "Security Group ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "group_name",
+   "fieldtype": "Data",
+   "label": "Security Group",
+   "read_only": 1
+  },
+  {
+   "depends_on": "error",
+   "fieldname": "section_error",
+   "fieldtype": "Section Break",
+   "label": "Error"
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Long Text",
+   "label": "Error",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-29 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SharePoint Core",
+ "name": "SharePoint Folder",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "folder_name",
+ "track_changes": 1
+}
