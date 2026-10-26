@@ -20,6 +20,8 @@ after_request = [
 
 app_include_js = "sharepoint_integration.bundle.js"
 
+boot_session = "sharepoint_integration.boot_session.boot_session"
+
 # Every save passes through these; they exit after a cached lookup unless the
 # DocType has a SharePoint Folder Rule.
 doc_events = {
