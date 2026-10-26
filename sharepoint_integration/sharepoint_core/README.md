@@ -39,4 +39,5 @@ per-document security groups.
 - `services/` — rule matching, folder request/provisioning, attachment request/upload, bulk run for existing records, access sync/expiry, notifications.
 - `document_events.py` — `doc_events["*"]` handlers (cached early exit for DocTypes without rules).
 - `tasks.py` — background job and scheduler entry points.
+- `../boot_session.py` — sends `frappe.boot.sharepoint` (enabled + DocTypes with an enabled rule) so the form's SharePoint button shows only when it can be used.
 - `api/v1/` — `folder` (incl. existing-records count/run), `file`, `settings`, `access` endpoints.
