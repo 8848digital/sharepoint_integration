@@ -12,6 +12,15 @@ from sharepoint_integration.sharepoint_core.graph.common import GraphError
 from sharepoint_integration.sharepoint_core.graph.directory import DirectoryService
 from sharepoint_integration.sharepoint_core.graph.drive import DriveService
 from sharepoint_integration.sharepoint_core.services.connection import resolve_rule_location
+from sharepoint_integration.sharepoint_core.services.folder_failure import (
+	STEP_FOLDER,
+	STEP_GROUP,
+	STEP_GROUP_ACCESS,
+	STEP_OWNER_ACCESS,
+	STEP_RESTRICT,
+	STEP_SUBFOLDERS,
+	failure_reason,
+)
 from sharepoint_integration.sharepoint_core.services.folder_outcome import (
 	link_reference,
 	sync_pending_access,
@@ -42,6 +51,9 @@ class FolderProvisioner:
 		self.settings = frappe.get_cached_doc("SharePoint Settings")
 		self.reference = frappe.get_doc(self.record.reference_doctype, self.record.reference_name)
 		self.drive = None
+		# Step in progress and owner emails, so a failure can say what went wrong.
+		self.step = STEP_FOLDER
+		self.owners = []
 
 	def run(self) -> None:
 		"""
@@ -66,8 +78,9 @@ class FolderProvisioner:
 			self.drive = DriveService(client, drive_id)
 
 			parent = self.drive.ensure_folder(self.rule.base_path, self.record.folder_name)
+			self.step = STEP_GROUP
 			group = self.__ensure_group(DirectoryService(client))
-			owners = self.__owner_emails()
+			owners = self.owners = self.__owner_emails()
 
 			self.__grant(parent["id"], owners, group, self.rule.grant_parent_folder_access)
 			subfolders = self.__create_subfolders(owners, group)
@@ -124,6 +137,7 @@ class FolderProvisioner:
 		created = []
 		for row in self.rule.sub_folders:
 			name = sanitize_folder_name(row.folder_name)
+			self.step = STEP_SUBFOLDERS
 			item = self.drive.ensure_folder(parent_path, name)
 			self.__grant(item["id"], owners, group, row.grant_group_access)
 			created.append(name)
@@ -145,14 +159,17 @@ class FolderProvisioner:
 		Returns:
 		        None
 		"""
+		self.step = STEP_OWNER_ACCESS
 		self.drive.invite(item_id, [{"email": email} for email in owners], "write")
 		allowed = {email.lower() for email in owners}
 
 		if group and include_group:
-			self.drive.invite(item_id, [{"objectId": group["id"]}], self.settings.group_access_role)
+			self.step = STEP_GROUP_ACCESS
+			self.drive.invite_group(item_id, group["id"], self.settings.group_access_role)
 			allowed.add(group["id"].lower())
 
 		if self.settings.restrict_folder_access and allowed:
+			self.step = STEP_RESTRICT
 			self.drive.restrict_to(item_id, allowed, bool(self.settings.keep_site_owners))
 
 	def __copy_template(self, folder_id: str, drive_id: str) -> str | None:
@@ -217,7 +234,8 @@ class FolderProvisioner:
 
 	def __mark_failed(self, error: Exception) -> None:
 		"""
-		Save the failure, log the traceback and email the configured recipients.
+		Save the failure with a plain-language reason, log the traceback and
+		email the configured recipients.
 
 		Parameters:
 		        error (Exception, required): The exception raised during provisioning.
@@ -227,7 +245,11 @@ class FolderProvisioner:
 		"""
 		frappe.log_error("SharePoint | Folder provisioning failed", frappe.get_traceback())
 		self.record.db_set(
-			{"status": "Failed", "error": str(error)[:5000], "attempts": self.record.attempts}
+			{
+				"status": "Failed",
+				"error": failure_reason(error, self.step, self.owners)[:5000],
+				"attempts": self.record.attempts,
+			}
 		)
 		notify_failure(self.record)
 

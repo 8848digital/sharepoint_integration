@@ -28,6 +28,24 @@ class GraphError(Exception):
 		self.payload = payload or {}
 
 
+def is_unresolved_recipient(error: Exception) -> bool:
+	"""
+	Whether SharePoint rejected an invite because it does not know a user/group,
+	e.g. a group created seconds ago that has not reached SharePoint yet.
+
+	Parameters:
+	        error (Exception, required): Error raised by a Graph call.
+
+	Returns:
+	        bool: True for Graph 400 "One or more users could not be resolved".
+	"""
+	return (
+		isinstance(error, GraphError)
+		and error.status_code == 400
+		and "could not be resolved" in str(error).lower()
+	)
+
+
 def encode_path(path: str) -> str:
 	"""
 	URL-encode a drive-relative path while keeping "/" separators.

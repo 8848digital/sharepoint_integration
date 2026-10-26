@@ -5,10 +5,18 @@
 
 """Folder, file-copy and permission operations on one SharePoint document library."""
 
+import time
+
 from sharepoint_integration.sharepoint_core.graph.client import GraphClient
-from sharepoint_integration.sharepoint_core.graph.common import GraphError, encode_path
+from sharepoint_integration.sharepoint_core.graph.common import (
+	GraphError,
+	encode_path,
+	is_unresolved_recipient,
+)
 
 WRITE_ROLES = ("write", "read")
+# Seconds to wait between tries while a new group reaches SharePoint (about 2 minutes in total).
+GROUP_WAITS = (10, 20, 30, 60)
 
 
 class DriveService:
@@ -111,6 +119,29 @@ class DriveService:
 			.json()
 			.get("value", [])
 		)
+
+	def invite_group(self, item_id: str, group_id: str, role: str) -> list[dict]:
+		"""
+		Grant a group access, waiting while SharePoint does not know the group yet.
+		A group created in Entra takes from seconds to minutes to reach SharePoint,
+		so an invite right after creating it fails with "could not be resolved".
+
+		Parameters:
+		        item_id (str, required): driveItem id.
+		        group_id (str, required): Group object id.
+		        role (str, required): "write" or "read".
+
+		Returns:
+		        list[dict]: Permissions created by Graph.
+		"""
+		for wait in GROUP_WAITS:
+			try:
+				return self.invite(item_id, [{"objectId": group_id}], role)
+			except GraphError as error:
+				if not is_unresolved_recipient(error):
+					raise
+			time.sleep(wait)
+		return self.invite(item_id, [{"objectId": group_id}], role)
 
 	def restrict_to(
 		self, item_id: str, allowed_principals: set[str], keep_site_owners: bool = True
